@@ -1,7 +1,181 @@
 <!DOCTYPE html>
 <html>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.$</p>
+<!-- code formatted by http://manoli.net/csharpformat/ -->
+<pre class="csharpcode">
+<span class="kwrd">public</span> <span class="kwrd">interface</span> IGroup&lt;T&gt;
+{
+    T Law(T a, T b);
+    T Inverse(T a);
+    T Identify { <span class="kwrd">get</span>; }
+}
+
+<span class="kwrd">public</span> <span class="kwrd">struct</span> Group&lt;T, G&gt; where G : <span class="kwrd">struct</span>, IGroup&lt;T&gt;
+{
+    <span class="kwrd">public</span> T Value;
+    <span class="kwrd">public</span> Group(T value)
+    {
+        Value = value;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> <span class="kwrd">implicit</span> <span class="kwrd">operator</span> Group&lt;T, G&gt;(T value) =&gt; <span class="kwrd">new</span> Group&lt;T, G&gt;(value);
+    <span class="kwrd">public</span> <span class="kwrd">static</span> <span class="kwrd">implicit</span> <span class="kwrd">operator</span> T(Group&lt;T, G&gt; value) =&gt; value.Value;
+    <span class="kwrd">public</span> <span class="kwrd">static</span> T <span class="kwrd">operator</span> +(Group&lt;T, G&gt; a, Group&lt;T, G&gt; b) =&gt; <span class="kwrd">default</span>(G).Law(a, b);
+    <span class="kwrd">public</span> <span class="kwrd">static</span> Group&lt;T, G&gt; Zero = <span class="kwrd">new</span> Group&lt;T, G&gt;(<span class="kwrd">default</span>(G).Identify);
+}
+
+<span class="kwrd">public</span> <span class="kwrd">struct</span> Int32Group : IGroup&lt;<span class="kwrd">int</span>&gt;
+{
+    <span class="kwrd">public</span> <span class="kwrd">int</span> Identify =&gt; 0;
+    <span class="kwrd">public</span> <span class="kwrd">int</span> Inverse(<span class="kwrd">int</span> a) =&gt; -a;
+    <span class="kwrd">public</span> <span class="kwrd">int</span> Law(<span class="kwrd">int</span> a, <span class="kwrd">int</span> b) =&gt; a + b;
+}
+
+<span class="kwrd">public</span> <span class="kwrd">struct</span> FloatGroup : IGroup&lt;<span class="kwrd">float</span>&gt;
+{
+    <span class="kwrd">public</span> <span class="kwrd">float</span> Identify =&gt; 0;
+    <span class="kwrd">public</span> <span class="kwrd">float</span> Inverse(<span class="kwrd">float</span> a) =&gt; -a;
+    <span class="kwrd">public</span> <span class="kwrd">float</span> Law(<span class="kwrd">float</span> a, <span class="kwrd">float</span> b) =&gt; a + b;
+}
+
+<span class="kwrd">public</span> <span class="kwrd">struct</span> DoubleGroup : IGroup&lt;<span class="kwrd">double</span>&gt;
+{
+    <span class="kwrd">public</span> <span class="kwrd">double</span> Identify =&gt; 0;
+    <span class="kwrd">public</span> <span class="kwrd">double</span> Inverse(<span class="kwrd">double</span> a) =&gt; -a;
+    <span class="kwrd">public</span> <span class="kwrd">double</span> Law(<span class="kwrd">double</span> a, <span class="kwrd">double</span> b) =&gt; a + b;
+}
+
+<span class="kwrd">public</span> <span class="kwrd">static</span> <span class="kwrd">class</span> Examples
+{
+    <span class="rem">// struct Int32 : IGroup&lt;Int32&gt;</span>
+   
+    <span class="kwrd">public</span> <span class="kwrd">static</span> T Sum&lt;T, G&gt;(<span class="kwrd">this</span> T[] source) where G : <span class="kwrd">struct</span>, IGroup&lt;T&gt;
+    {
+        <span class="kwrd">var</span> sum = Group&lt;T, G&gt;.Zero;
+        <span class="kwrd">foreach</span> (<span class="kwrd">var</span> item <span class="kwrd">in</span> source)
+            sum += item;
+        <span class="kwrd">return</span> sum;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> <span class="kwrd">int</span> Sum(<span class="kwrd">this</span> <span class="kwrd">int</span>[] source)
+    {
+        <span class="kwrd">var</span> sum = 0;
+        <span class="kwrd">foreach</span> (<span class="kwrd">var</span> item <span class="kwrd">in</span> source)
+            sum += item;
+        <span class="kwrd">return</span> sum;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> <span class="kwrd">float</span> Sum(<span class="kwrd">this</span> <span class="kwrd">float</span>[] source)
+    {
+        <span class="kwrd">var</span> sum = 0f;
+        <span class="kwrd">foreach</span> (<span class="kwrd">var</span> item <span class="kwrd">in</span> source)
+            sum += item;
+        <span class="kwrd">return</span> sum;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> <span class="kwrd">double</span> Sum(<span class="kwrd">this</span> <span class="kwrd">double</span>[] source)
+    {
+        <span class="kwrd">var</span> sum = 0.0;
+        <span class="kwrd">foreach</span> (<span class="kwrd">var</span> item <span class="kwrd">in</span> source)
+            sum += item;
+        <span class="kwrd">return</span> sum;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> TimeSpan TestSpeed1(<span class="kwrd">int</span> seed, <span class="kwrd">int</span> count)
+    {
+        <span class="kwrd">var</span> random = <span class="kwrd">new</span> Random(seed);
+        <span class="kwrd">var</span> array = <span class="kwrd">new</span> <span class="kwrd">int</span>[count];
+        <span class="kwrd">for</span> (<span class="kwrd">var</span> i = 0; i &lt; count; i++)
+            array[i] = random.Next(-10, 11);
+
+        <span class="kwrd">var</span> watch = <span class="kwrd">new</span> Stopwatch();
+        watch.Start();
+
+        <span class="kwrd">var</span> sum = array.Sum();
+
+        watch.Stop();
+        <span class="kwrd">return</span> watch.Elapsed;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> TimeSpan TestSpeed2(<span class="kwrd">int</span> seed, <span class="kwrd">int</span> count)
+    {
+        <span class="kwrd">var</span> random = <span class="kwrd">new</span> Random(seed);
+        <span class="kwrd">var</span> array = <span class="kwrd">new</span> <span class="kwrd">int</span>[count];
+        <span class="kwrd">for</span> (<span class="kwrd">var</span> i = 0; i &lt; count; i++)
+            array[i] = random.Next(-10, 11);
+
+        <span class="kwrd">var</span> watch = <span class="kwrd">new</span> Stopwatch();
+        watch.Start();
+
+        <span class="kwrd">var</span> sum = array.Sum&lt;<span class="kwrd">int</span>, Int32Group&gt;();
+
+        watch.Stop();
+        <span class="kwrd">return</span> watch.Elapsed;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> TimeSpan TestSpeedDouble1(<span class="kwrd">int</span> seed, <span class="kwrd">int</span> count)
+    {
+        <span class="kwrd">var</span> random = <span class="kwrd">new</span> Random(seed);
+        <span class="kwrd">var</span> array = <span class="kwrd">new</span> <span class="kwrd">double</span>[count];
+        <span class="kwrd">for</span> (<span class="kwrd">var</span> i = 0; i &lt; count; i++)
+            array[i] = (random.NextDouble() - .5) * 2;
+
+        <span class="kwrd">var</span> watch = <span class="kwrd">new</span> Stopwatch();
+        watch.Start();
+
+        <span class="kwrd">var</span> sum = array.Sum();
+
+        watch.Stop();
+        <span class="kwrd">return</span> watch.Elapsed;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> TimeSpan TestSpeedDouble2(<span class="kwrd">int</span> seed, <span class="kwrd">int</span> count)
+    {
+        <span class="kwrd">var</span> random = <span class="kwrd">new</span> Random(seed);
+        <span class="kwrd">var</span> array = <span class="kwrd">new</span> <span class="kwrd">double</span>[count];
+        <span class="kwrd">for</span> (<span class="kwrd">var</span> i = 0; i &lt; count; i++)
+            array[i] = (random.NextDouble() - .5) * 2;
+
+        <span class="kwrd">var</span> watch = <span class="kwrd">new</span> Stopwatch();
+        watch.Start();
+
+        <span class="kwrd">var</span> sum = array.Sum&lt;<span class="kwrd">double</span>, DoubleGroup&gt;();
+
+        watch.Stop();
+        <span class="kwrd">return</span> watch.Elapsed;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> TimeSpan TestSpeedFloat1(<span class="kwrd">int</span> seed, <span class="kwrd">int</span> count)
+    {
+        <span class="kwrd">var</span> random = <span class="kwrd">new</span> Random(seed);
+        <span class="kwrd">var</span> array = <span class="kwrd">new</span> <span class="kwrd">float</span>[count];
+        <span class="kwrd">for</span> (<span class="kwrd">var</span> i = 0; i &lt; count; i++)
+            array[i] = (<span class="kwrd">float</span>)((random.NextDouble() - .5) * 2);
+
+        <span class="kwrd">var</span> watch = <span class="kwrd">new</span> Stopwatch();
+        watch.Start();
+
+        <span class="kwrd">var</span> sum = array.Sum();
+
+        watch.Stop();
+        <span class="kwrd">return</span> watch.Elapsed;
+    }
+
+    <span class="kwrd">public</span> <span class="kwrd">static</span> TimeSpan TestSpeedFloat2(<span class="kwrd">int</span> seed, <span class="kwrd">int</span> count)
+    {
+        <span class="kwrd">var</span> random = <span class="kwrd">new</span> Random(seed);
+        <span class="kwrd">var</span> array = <span class="kwrd">new</span> <span class="kwrd">float</span>[count];
+        <span class="kwrd">for</span> (<span class="kwrd">var</span> i = 0; i &lt; count; i++)
+            array[i] = (<span class="kwrd">float</span>)((random.NextDouble() - .5) * 2);
+
+        <span class="kwrd">var</span> watch = <span class="kwrd">new</span> Stopwatch();
+        watch.Start();
+
+        <span class="kwrd">var</span> sum = array.Sum&lt;<span class="kwrd">float</span>, FloatGroup&gt;();
+
+        watch.Stop();
+        <span class="kwrd">return</span> watch.Elapsed;
+    }
+</pre>
 </body>
 </html>
